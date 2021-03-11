@@ -1,12 +1,21 @@
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, TextField, Toolbar, Typography } from '@material-ui/core';
+import { Button, Card, CardActions, CardMedia, IconButton, Toolbar, Typography } from '@material-ui/core';
+import UploadIcon from '@material-ui/icons/CloudUpload';
 import {Recipe} from '../models';
 import {useFetch} from '../useFetch';
+import placeholder from '../assets/placeholder.png';
 
 const useStyles = makeStyles((theme) => ({
-    input: {
-        width: '100%',
+    imagePanel: {
+        width: '20vh',
+
+    },
+    image: {
+        height: '30vh',
+        widht: '20vh',
+    },
+    imageButton: {
     },
     toolbar: {
         marginTop: theme.spacing(2),
@@ -16,30 +25,37 @@ const useStyles = makeStyles((theme) => ({
 export function Details() {
     const classes = useStyles();
     const history = useHistory();
-    const match = useRouteMatch<{id}>();
-    const editMode = match.params.id && match.params.id !== 'new-recipe';
-
-    const {data, loading, error} = useFetch<Recipe>(editMode ? '/api/recipes/' + match.params.id : null);
+    const match = useRouteMatch<{id: string}>();
+    const {data, loading, error} = useFetch<Recipe>(match.params.id ? '/api/recipes/' + match.params.id : null);
     const recipe = data;
+    async function handleDelete() {
+        if (window.confirm('Delete recipe?')) {
+            await fetch(`/api/recipes/${match.params.id}`, {method: 'DELETE'});
+            history.push('/');
+        }
+    }
     if (loading) {
         return <div>Loading</div>;
     }
     if (error) {
-        return <div>Could not load recipes</div>;
+        return <div>Could not load recipe</div>;
     }
-
+    if (!recipe) {
+        return <div />
+    }
     return (
         <>
-            <Typography variant="h2" component="h1">{editMode ? 'Edit recipe' : 'New recipe'}</Typography>
-            <div>
-                <TextField label="Title" value={recipe?.title} className={classes.input} />
-            </div>
-            <div>
-                <TextField label="Description" value={recipe?.description} multiline className={classes.input} />
-            </div>
+            <Typography variant="h2" component="h1">{recipe.title}</Typography>
+            <Card className={classes.imagePanel} variant="outlined">
+                <CardMedia className={classes.image} image={recipe.imageUrl ?? placeholder} />
+                <CardActions>
+                <IconButton className={classes.imageButton} size="small"><UploadIcon /></IconButton>
+                </CardActions>
+            </Card>
+            <Typography>{recipe.description}</Typography>
             <Toolbar className={classes.toolbar}>
-                <Button onClick={() => history.push('/')}>Cancel</Button>
-                <Button color="primary" variant="contained" onClick={() => history.push('/')}>Save</Button>
+                <Button onClick={() => history.push(`/${recipe.id}/edit`)}>Edit</Button>
+                <Button onClick={handleDelete}>Delete</Button>
             </Toolbar>
         </>);
 }

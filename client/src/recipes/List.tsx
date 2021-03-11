@@ -61,7 +61,7 @@ export function List() {
     return (
         <>
              {fetchResult && fetchResult!.data?.recipes.map(({ id, title, description, imageUrl }) =>
-                <Card className={classes.card}>
+                <Card key={id} className={classes.card}>
                     <CardActionArea className={classes.actionArea} onClick={() => history.push(`/${id}`)}>
                         <CardMedia className={classes.image} image={imageUrl ?? placeholder} />
                         <CardContent className={classes.content}>
