@@ -1,47 +1,25 @@
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import { Button, TextField, Toolbar, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import {Recipe} from '../models';
 import {useFetch} from '../useFetch';
+import { RecipeForm } from './components/RecipeForm';
 
-const useStyles = makeStyles((theme) => ({
-    input: {
-        width: '100%',
-    },
-    toolbar: {
-        marginTop: theme.spacing(2),
-    }
-}));
-
-interface EditProps {
-    editMode: 'create' | 'edit',
-}
-export function Edit<EditProps>({editMode}) {
-    const classes = useStyles();
-    const history = useHistory();
+export function Edit() {
     const match = useRouteMatch<{id}>();
-
-    const {data, loading, error} = useFetch<Recipe>(editMode === 'edit' ? '/api/recipes/' + match.params.id : null);
-    const recipe = data;
-    if (loading) {
-        return <div>Loading</div>;
+    const history = useHistory();
+    const {data, loading, error} = useFetch<Recipe>('/api/recipes/' + match.params.id);
+    async function handleSave(values) {
+        await fetch(`/api/recipes/${match.params.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(values),
+        });
+        history.push('/');
     }
-    if (error) {
-        return <div>Could not load recipes</div>;
-    }
-
     return (
         <>
-            <Typography variant="h2" component="h1">{editMode === 'edit'? 'Edit recipe' : 'New recipe'}</Typography>
-            <div>
-                <TextField label="Title" value={recipe?.title} className={classes.input} />
-            </div>
-            <div>
-                <TextField label="Description" value={recipe?.description} multiline className={classes.input} />
-            </div>
-            <Toolbar className={classes.toolbar}>
-                <Button onClick={() => history.push('/')}>Cancel</Button>
-                <Button color="primary" variant="contained" onClick={() => history.push('/')}>Save</Button>
-            </Toolbar>
+            <Typography variant="h2" component="h1">Edit recipe</Typography>
+            {loading && <Typography>Loading...</Typography>}
+            {error && <Typography>Could not load recipe</Typography>}
+            {data && <RecipeForm recipe={data} onSave={handleSave} />}
         </>);
 }

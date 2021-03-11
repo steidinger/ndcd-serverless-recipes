@@ -5,6 +5,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import { Create } from './recipes/Create';
 import { Edit } from './recipes/Edit';
 import { Details } from './recipes/Details';
 import { List } from './recipes/List';
@@ -33,8 +34,8 @@ function App() {
       <Container fixed>
         <Router>
           <Switch>
-            <Route path="/new-recipe"><Edit editMode="create" /></Route>
-            <Route path="/:id/edit"><Edit editMode="edit" /></Route>
+            <Route path="/new-recipe"><Create /></Route>
+            <Route path="/:id/edit"><Edit /></Route>
             <Route path="/:id"><Details /></Route>
             <Route path="/"><List /></Route>
           </Switch>
