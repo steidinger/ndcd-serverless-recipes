@@ -49,7 +49,9 @@ export function Details() {
             <Card className={classes.imagePanel} variant="outlined">
                 <CardMedia className={classes.image} image={recipe.imageUrl ?? placeholder} />
                 <CardActions>
-                <IconButton className={classes.imageButton} size="small"><UploadIcon /></IconButton>
+                    <IconButton className={classes.imageButton} size="small" onClick={() => history.push(`/${recipe.id}/upload`)}>
+                        <UploadIcon />
+                    </IconButton>
                 </CardActions>
             </Card>
             <Typography>{recipe.description}</Typography>
