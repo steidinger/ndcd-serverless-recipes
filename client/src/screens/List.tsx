@@ -64,7 +64,7 @@ export function List() {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [apiClient]);
 
     if (loading) {
         return <div>Loading</div>;

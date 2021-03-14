@@ -12,12 +12,13 @@ export function Edit() {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const id = match.params.id;
 
     useEffect(() => {
         (async function () {
             setLoading(true);
             try {
-                const data = await apiClient.getRecipe(match.params.id);
+                const data = await apiClient.getRecipe(id);
                 setRecipe(data);
             } catch (error) {
                 setError('could not load recipes: ' + error);
@@ -26,7 +27,7 @@ export function Edit() {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [apiClient, id]);
 
     async function handleSave(values: Recipe) {
         await apiClient.saveRecipe(values);

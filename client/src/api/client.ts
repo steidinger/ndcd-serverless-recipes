@@ -9,7 +9,11 @@ type SaveRecipeHandler = (recipe: Recipe) => Promise<void>;
 type UploadImageHandler = (id: string, image: File, onProgress: (progress: string) => void) => Promise<void>;
 
 export class ApiClient {
-    constructor(private getAccessToken: (options?: GetTokenSilentlyOptions) => Promise<string>) {}
+    private getAccessToken: (options?: GetTokenSilentlyOptions) => Promise<string>;
+
+    set tokenAccessFunction(func: (options?: GetTokenSilentlyOptions) => Promise<string>) {
+        this.getAccessToken = func;
+    }
 
     createRecipe: SaveRecipeHandler = async (recipe: Recipe) => {
         const token = await this.getAccessToken();
@@ -104,8 +108,10 @@ export class ApiClient {
     }
 }
 
+const apiClient = new ApiClient();
 
 export function useApiClient(): ApiClient {
     const {getAccessTokenSilently} = useAuth0();
-    return new ApiClient(getAccessTokenSilently);
+    apiClient.tokenAccessFunction = getAccessTokenSilently;
+    return apiClient;
 }

@@ -11,16 +11,16 @@ import placeholder from '../assets/placeholder.png';
 const useStyles = makeStyles((theme) => ({
     imagePanel: {
         width: '20vh',
-
     },
     image: {
         height: '30vh',
         widht: '20vh',
     },
-    imageButton: {
-    },
     toolbar: {
         marginTop: theme.spacing(2),
+        paddingLeft: 0,
+        paddingRight: 0,
+        justifyContent: 'space-between',
     }
 }));
 
@@ -32,12 +32,13 @@ export function Details() {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const id = match.params.id;
 
     useEffect(() => {
         (async function () {
             setLoading(true);
             try {
-                const data = await apiClient.getRecipe(match.params.id);
+                const data = await apiClient.getRecipe(id);
                 setRecipe(data);
             } catch (error) {
                 setError('could not load recipes: ' + error);
@@ -46,11 +47,11 @@ export function Details() {
                 setLoading(false);
             }
         })();
-    }, []);
+    }, [apiClient, id]);
 
     async function handleDelete() {
         if (window.confirm('Delete recipe?')) {
-            await apiClient.deleteRecipe(match.params.id);
+            await apiClient.deleteRecipe(id);
             history.push('/');
         }
     }
@@ -69,15 +70,15 @@ export function Details() {
             <Card className={classes.imagePanel} variant="outlined">
                 <CardMedia className={classes.image} image={recipe.imageUrl ?? placeholder} />
                 <CardActions>
-                    <IconButton className={classes.imageButton} size="small" onClick={() => history.push(`/${recipe.id}/upload`)}>
+                    <IconButton aria-label="Upload image" size="small" onClick={() => history.push(`/${recipe.id}/upload`)}>
                         <UploadIcon />
                     </IconButton>
                 </CardActions>
             </Card>
             <Typography>{recipe.description}</Typography>
             <Toolbar className={classes.toolbar}>
+            <Button onClick={handleDelete}>Delete</Button>
                 <Button onClick={() => history.push(`/${recipe.id}/edit`)}>Edit</Button>
-                <Button onClick={handleDelete}>Delete</Button>
             </Toolbar>
         </>);
 }
