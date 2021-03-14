@@ -1,14 +1,24 @@
 import path from 'path';
-import { rest } from 'msw'
+import { rest, RestRequest } from 'msw'
 import { recipes } from './recipes';
 import * as uuid from 'uuid';
 
-function findRecipe(id) {
+function findRecipe(id: string) {
     return recipes.find(r => r.id === id);
 }
 
+function checkToken(req: RestRequest) {
+    const authorization = req.headers.get('Authorization');
+    if (authorization === null || authorization.indexOf('Bearer ') !== 0) {
+        return false;
+    }
+    return true;
+}
 const mocks = [
     rest.get('/api/recipes', (req, res, ctx) => {
+        if (!checkToken(req)) {
+            return res(ctx.status(403));
+        }
         return res(
             ctx.json({
                 recipes

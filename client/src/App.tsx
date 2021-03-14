@@ -10,7 +10,8 @@ function App() {
       domain={authConfig.domain}
       clientId={authConfig.clientId}
       redirectUri={authConfig.callbackUrl}
-    >
+      audience={authConfig.audience}
+      >
       <Router>
         <Home />
       </Router>

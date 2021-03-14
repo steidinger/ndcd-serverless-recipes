@@ -2,6 +2,7 @@ import { useHistory, useRouteMatch } from 'react-router-dom';
 import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Toolbar, Typography } from '@material-ui/core';
+import {useApiClient} from '../api/client';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -16,32 +17,14 @@ export function Upload() {
     const classes = useStyles();
     const history = useHistory();
     const match = useRouteMatch<{ id: string }>();
+    const apiClient = useApiClient();
     const [upload, setUpload] = useState(null);
     const [progress, setProgress] = useState('');
 
     async function handleUpload() {
         if (upload) {
-            setProgress('Uploading metadata');
-            const metaDataResponse = await fetch(`/api/recipes/${match.params.id}/image`, {
-                headers: {
-                    'content-type': 'application/json',
-                },
-                method: 'POST',
-                body: JSON.stringify({ filename: upload.name }),
-            });
-            if (metaDataResponse.status === 200) {
-                const { uploadUrl } = await metaDataResponse.json();
-                setProgress('Uploading image');
-                await fetch(uploadUrl, {
-                    headers: {
-                        'content-type': upload.type,
-                    },
-                    method: 'PUT',
-                    body: upload.stream(),
-                });
-                setProgress('');
-                history.push(`/${match.params.id}`);
-            }
+            await apiClient.uploadImage(match.params.id, upload, setProgress);
+            history.push(`/${match.params.id}`);
         }
     }
 

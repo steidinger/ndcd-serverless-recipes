@@ -2,15 +2,15 @@ import { useHistory } from 'react-router-dom';
 import { Typography } from '@material-ui/core';
 import {Recipe} from '../models';
 import { RecipeForm } from './components/RecipeForm';
+import {useApiClient} from '../api/client';
 
 export function Create() {
     const recipe = {title: '', description: ''} as Recipe;
     const history = useHistory();
+    const apiClient = useApiClient();
+
     async function handleSave(values: Recipe) {
-        await fetch('/api/recipes', {
-            method: 'POST',
-            body: JSON.stringify(values),
-        });
+        await apiClient.createRecipe(values);
         history.push('/');
     }
     return (

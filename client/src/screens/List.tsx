@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { Card, CardActionArea, CardContent, CardMedia, Fab, Link, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import placeholder from '../assets/placeholder.png';
-import {Recipe} from '../models';
-import {useFetch} from '../useFetch';
+import { Recipe } from '../models';
+import { useApiClient } from '../api/client';
 
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -39,28 +40,41 @@ const useStyles = makeStyles((theme) => ({
         position: 'fixed',
         bottom: theme.spacing(2),
         right: theme.spacing(4),
-      },
+    },
 }));
-
-interface ListRecipesResponse {
-    recipes?: Recipe[],
-}
 
 export function List() {
     const history = useHistory();
     const classes = useStyles();
+    const apiClient = useApiClient();
+    const [recipes, setRecipes] = useState<Recipe[] | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const fetchResult = useFetch<ListRecipesResponse>('http://localhost:3000/api/recipes');
+    useEffect(() => {
+        (async function () {
+            setLoading(true);
+            try {
+                const data = await apiClient.getAllRecipes();
+                setRecipes(data);
+            } catch (error) {
+                setError('could not load recipes: ' + error);
+                setRecipes(null);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
 
-    if (fetchResult?.loading) {
+    if (loading) {
         return <div>Loading</div>;
     }
-    if (fetchResult?.error) {
+    if (error) {
         return <div>Could not load recipes</div>;
     }
     return (
         <>
-             {fetchResult && fetchResult!.data?.recipes.map(({ id, title, description, imageUrl }) =>
+            {recipes !== null && recipes.map(({ id, title, description, imageUrl }) =>
                 <Card key={id} className={classes.card}>
                     <CardActionArea className={classes.actionArea} onClick={() => history.push(`/${id}`)}>
                         <CardMedia className={classes.image} image={imageUrl ?? placeholder} />

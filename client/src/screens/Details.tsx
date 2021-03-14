@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Card, CardActions, CardMedia, IconButton, Toolbar, Typography } from '@material-ui/core';
 import UploadIcon from '@material-ui/icons/CloudUpload';
 import {Recipe} from '../models';
-import {useFetch} from '../useFetch';
+import {useApiClient} from '../api/client';
+
 import placeholder from '../assets/placeholder.png';
 
 const useStyles = makeStyles((theme) => ({
@@ -26,11 +28,29 @@ export function Details() {
     const classes = useStyles();
     const history = useHistory();
     const match = useRouteMatch<{id: string}>();
-    const {data, loading, error} = useFetch<Recipe>(match.params.id ? '/api/recipes/' + match.params.id : null);
-    const recipe = data;
+    const apiClient = useApiClient();
+    const [recipe, setRecipe] = useState<Recipe | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        (async function () {
+            setLoading(true);
+            try {
+                const data = await apiClient.getRecipe(match.params.id);
+                setRecipe(data);
+            } catch (error) {
+                setError('could not load recipes: ' + error);
+                setRecipe(null);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
+
     async function handleDelete() {
         if (window.confirm('Delete recipe?')) {
-            await fetch(`/api/recipes/${match.params.id}`, {method: 'DELETE'});
+            await apiClient.deleteRecipe(match.params.id);
             history.push('/');
         }
     }
