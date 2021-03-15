@@ -16,7 +16,9 @@ export async function create(recipe: SaveRecipeRequest, userId: string): Promise
         userId: userId,
         createdAt: new Date().toISOString(),
     }
-
+    if (recipe.title.trim().length === 0 || recipe.description.trim().length === 0) {
+        throw new createError.BadRequest('title and description must not be empty');
+    }
     logger.info(`adding Recipe ${JSON.stringify(newRecipe)}`)
     return RecipeAccess.createRecipe(newRecipe);
 }

@@ -30,7 +30,13 @@ export function Edit() {
     }, [apiClient, id]);
 
     async function handleSave(values: Recipe) {
-        await apiClient.saveRecipe(values);
+        setError('');
+        try {
+            await apiClient.saveRecipe(values);
+            history.push('/');
+        } catch (e) {
+            setError(e.message ?? e.toString())
+        }
         history.push('/');
     }
     return (

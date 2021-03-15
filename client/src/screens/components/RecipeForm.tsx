@@ -24,7 +24,6 @@ export function RecipeForm({recipe, onSave}: RecipeFormProps) {
     const formik = useFormik({
         initialValues: recipe,
         onSubmit: (values) => {
-            console.log('Submit', values);
             onSave(values);
         },
     });
@@ -51,7 +50,14 @@ export function RecipeForm({recipe, onSave}: RecipeFormProps) {
             </div>
             <Toolbar className={classes.toolbar}>
                 <Button onClick={() => history.push('/')}>Cancel</Button>
-                <Button color="primary" variant="contained" type="submit">Save</Button>
+                <Button
+                    color="primary"
+                    variant="contained"
+                    type="submit"
+                    disabled={!formik.values.title || !formik.values.description}
+                >
+                    Save
+                </Button>
             </Toolbar>
         </form>
     )

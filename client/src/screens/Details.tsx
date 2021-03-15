@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Card, CardActions, CardMedia, IconButton, Toolbar, Typography } from '@material-ui/core';
-import UploadIcon from '@material-ui/icons/CloudUpload';
+import UploadIcon from '@material-ui/icons/Edit';
 import {Recipe} from '../models';
 import {useApiClient} from '../api/client';
 
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     },
     image: {
         height: '30vh',
-        widht: '20vh',
+        width: '20vh',
     },
     toolbar: {
         marginTop: theme.spacing(2),
@@ -77,7 +77,8 @@ export function Details() {
             </Card>
             <Typography>{recipe.description}</Typography>
             <Toolbar className={classes.toolbar}>
-            <Button onClick={handleDelete}>Delete</Button>
+                <Button onClick={handleDelete}>Delete</Button>
+                <Button onClick={() => history.push('/')}>Close</Button>
                 <Button onClick={() => history.push(`/${recipe.id}/edit`)}>Edit</Button>
             </Toolbar>
         </>);
