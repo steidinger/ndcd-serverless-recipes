@@ -37,12 +37,12 @@ const mocks = [
         if (!findRecipe(req.params.id)) {
             return res(ctx.status(404));
         }
-        return res(ctx.status(200));
+        return res(ctx.status(204));
     }),
     rest.post('/api/recipes', (req, res, ctx) => {
         return res(ctx.status(201));
     }),
-    rest.put('/api/recipes/:id', (req, res, ctx) => {
+    rest.patch('/api/recipes/:id', (req, res, ctx) => {
         if (!findRecipe(req.params.id)) {
             return res(ctx.status(404));
         }
@@ -57,7 +57,7 @@ const mocks = [
         }
         const extension = path.extname(req.body['filename']);
         return res(
-            ctx.status(200),
+            ctx.status(201),
             ctx.delay(1000),
             ctx.json({ uploadUrl: '/api/upload/' + uuid.v4() + extension })
         );

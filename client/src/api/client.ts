@@ -35,8 +35,11 @@ export class ApiClient {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-            method: 'PUT',
-            body: JSON.stringify(recipe),
+            method: 'PATCH',
+            body: JSON.stringify({
+                title: recipe.title,
+                description: recipe.description,
+            }),
         });
         if (response.status !== 200) {
             throw new Error("Could not save recipe");
@@ -92,16 +95,15 @@ export class ApiClient {
             method: 'POST',
             body: JSON.stringify({ filename: image.name }),
         });
-        if (metaDataResponse.status === 200) {
+        if (metaDataResponse.status === 201) {
             const { uploadUrl } = await metaDataResponse.json();
             onProgress('Uploading image');
             await fetch(uploadUrl, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     'content-type': image.type,
                 },
                 method: 'PUT',
-                body: image.stream(),
+                body: image,
             });
             onProgress('');
         }
